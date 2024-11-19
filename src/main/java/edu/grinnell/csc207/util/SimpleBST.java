@@ -9,8 +9,8 @@ import java.util.function.BiConsumer;
 /**
  * A simple implementation of binary search trees.
  *
- * @author Your Name Here
- * @author Your Name Here
+ * @author David William Stroud
+ * @author Paden Houck
  * @author Samuel A. Rebelsky
  *
  * @param <K>
@@ -89,7 +89,37 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
    */
   @Override
   public V set(K key, V value) {
-    return null;        // STUB
+    if (key == null) {
+      throw new NullPointerException("Key in SimpleBST.set is null");
+    } // if
+
+    if (this.root == null) {
+      this.root = new BSTNode<K, V>(key, value);
+      return null;
+    } // if
+
+    BSTNode<K, V> curr = this.root;
+    do {
+      int compared = this.order.compare(curr.key, key);
+      if (compared == 0) {
+        V old = curr.value;
+        curr.value = value;
+        return old;
+      } // if
+      if (compared < 0) {
+        if (curr.right == null) {
+          curr.right = new BSTNode<K, V>(key, value);
+          return null;
+        } // if
+        curr = curr.right;
+      } else {
+        if (curr.left == null) {
+          curr.left = new BSTNode<K, V>(key, value);
+          return null;
+        } // if
+        curr = curr.left;
+      } // if-else
+    } while (true);
   } // set(K, V)
 
   /**
@@ -210,7 +240,13 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
    */
   @Override
   public void forEach(BiConsumer<? super K, ? super V> action) {
-    // STUB
+    Iterator<BSTNode<K,V>> nodesIterator= this.nodes();
+    
+    while(nodesIterator.hasNext()) {
+
+      BSTNode<K,V> curr = nodesIterator.next();
+      action.accept(curr.key,curr.value);
+    } // while
   } // forEach
 
   // +----------------------+----------------------------------------
@@ -303,8 +339,14 @@ public class SimpleBST<K, V> implements SimpleMap<K, V> {
       @Override
       public BSTNode<K, V> next() {
         checkInit();
-        // STUB
-        return null;
+        BSTNode<K, V> node = stack.pop();
+        if (node.left != null) {
+          stack.push(node.left);
+        } // if
+        if (node.right != null) {
+          stack.push(node.right);
+        } // if
+        return node;
       } // next();
 
       void checkInit() {
